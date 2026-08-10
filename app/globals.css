@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  body {
+    @apply bg-white text-navy antialiased;
+    font-feature-settings: "ss01", "cv01";
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg bg-navy px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-navy-light focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 disabled:opacity-50;
+  }
+  .btn-gold {
+    @apply inline-flex items-center justify-center rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-navy shadow-sm transition hover:bg-gold-light focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2 disabled:opacity-50;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-lg border border-navy/15 bg-white px-5 py-2.5 text-sm font-semibold text-navy transition hover:border-navy/30 hover:bg-navy/5;
+  }
+  .input {
+    @apply w-full rounded-lg border border-navy/15 bg-white px-3 py-2 text-sm text-navy shadow-sm placeholder:text-navy/40 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/40;
+  }
+  .label {
+    @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-navy/70;
+  }
+  .card {
+    @apply rounded-xl border border-navy/10 bg-white p-6 shadow-sm;
+  }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff !important; }
+  .print-area { padding: 0 !important; }
+}

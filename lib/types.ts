@@ -1,0 +1,49 @@
+export type Profile = {
+  id: string;
+  user_id: string;
+  first_name: string | null;
+  last_name: string | null;
+  username: string;
+  job_title: string | null;
+  bio: string | null;
+  location: string | null;
+  photo_url: string | null;
+  phone: string | null;
+  website: string | null;
+  linkedin: string | null;
+  github: string | null;
+  updated_at: string | null;
+};
+
+export type Skill = { id: string; profile_id: string; skill: string };
+export type Experience = {
+  id: string;
+  profile_id: string;
+  position: string;
+  company: string;
+  description: string | null;
+  start_date: string | null;
+  end_date: string | null;
+};
+export type Education = {
+  id: string;
+  profile_id: string;
+  school: string;
+  degree: string;
+  year: string | null;
+};
+export type Project = {
+  id: string;
+  profile_id: string;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  url: string | null;
+};
+
+export type PublicProfile = Profile & {
+  skills: Skill[];
+  experiences: Experience[];
+  education: Education[];
+  projects: Project[];
+};
