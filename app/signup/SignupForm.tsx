@@ -1,15 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export function SignupForm() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false); // État pour afficher le message de succès
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,24 +43,9 @@ export function SignupForm() {
       return;
     }
 
-    // Si tout s'est bien passé, on affiche le message de confirmation d'email
-    setIsSubmitted(true);
-  }
-
-  // Si l'inscription a réussi, on affiche ce bloc à la place du formulaire
-  if (isSubmitted) {
-    return (
-      <div className="rounded-xl border border-gold/20 bg-navy/5 p-6 text-center">
-        <h2 className="text-xl font-bold text-navy mb-3">Vérifie ta boîte mail ! ✉️</h2>
-        <p className="text-sm text-navy/80 leading-relaxed mb-4">
-          Un lien de confirmation vient de t'être envoyé à l'adresse : <br />
-          <strong className="text-navy">{email}</strong>.
-        </p>
-        <p className="text-xs text-navy/60">
-          Pense à vérifier tes courriers indésirables (spams) si tu ne vois rien arriver d'ici quelques minutes.
-        </p>
-      </div>
-    );
+    // Si la confirmation email est activée, redirige vers /login avec un message
+    router.push("/login?signup=1");
+    router.refresh();
   }
 
   return (
