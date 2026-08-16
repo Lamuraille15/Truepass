@@ -23,12 +23,15 @@ const config: Config = {
           300: "#404040",
           400: "#525252",
           500: "#737373",
+          soft: "#F4F4F5",
+          line: "#E4E4E7",
         },
-        navy:  { DEFAULT: "#0b1733" },
-        gold:  { DEFAULT: "#d4af37" },
       },
       fontFamily: {
         sans: ["Poppins", "system-ui", "sans-serif"],
+      },
+      boxShadow: {
+        soft: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
       },
     },
   },
