@@ -2,78 +2,62 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createServer } from "@/lib/supabase/server";
 import { LogoutButton } from "@/components/LogoutButton";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { DashboardClient } from "./DashboardClient";
 
 export default async function DashboardPage() {
   const supabase = await createServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, username, first_name, job_title, photo_url")
+    .select("id, username, first_name, last_name, job_title, photo_url, phone, website, linkedin, github, bio, location, updated_at")
     .eq("user_id", user.id)
     .maybeSingle();
-
   if (!profile) {
-    return (
-      <main className="mx-auto max-w-3xl px-6 py-12">
-        <p className="text-navy">Profil introuvable. Reconnecte-toi.</p>
-      </main>
-    );
+    return <main className="p-12">Profil introuvable.</main>;
   }
 
   const [skills, experiences, education, projects] = await Promise.all([
-    supabase.from("skills").select("*").eq("profile_id", profile.id).order("created_at", { ascending: false }),
-    supabase.from("experiences").select("*").eq("profile_id", profile.id).order("start_date", { ascending: false }),
-    supabase.from("education").select("*").eq("profile_id", profile.id).order("year", { ascending: false }),
-    supabase.from("projects").select("*").eq("profile_id", profile.id).order("created_at", { ascending: false }),
+    supabase.from("skills").select("*").eq("profile_id", profile.id),
+    supabase.from("experiences").select("*").eq("profile_id", profile.id),
+    supabase.from("education").select("*").eq("profile_id", profile.id),
+    supabase.from("projects").select("*").eq("profile_id", profile.id),
   ]);
 
+  // Calcul du pourcentage de complétude (juste indicatif)
+  const fields = [
+    profile.first_name, profile.last_name, profile.job_title, profile.bio,
+    profile.location, profile.photo_url, profile.phone, profile.website,
+  ];
+  const filled = fields.filter(Boolean).length;
+  const completeness = Math.round((filled / fields.length) * 100);
+
   return (
-    <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-6 py-8">
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-navy/10 pb-6">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-lg bg-navy text-gold font-serif text-lg">
-              T
-            </span>
-            <span className="text-lg font-semibold text-navy">TruePass</span>
-          </Link>
-          <span className="text-navy/30">·</span>
-          <span className="text-sm text-navy/60">
-            Bonjour {profile.first_name ?? "à toi"} 👋
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link href={`/${profile.username}`} target="_blank" className="btn-ghost py-2 text-xs">
-            Voir mon TrustLink ↗
-          </Link>
-          <LogoutButton />
-        </div>
-      </header>
+    <div className="flex min-h-screen bg-gelap-soft">
+      <DashboardSidebar username={profile.username} fullName={profile.first_name ?? "Vous"} firstName={profile.first_name ?? "—"} />
 
-      <nav className="mt-6 flex flex-wrap gap-2">
-        {[
-          { href: "/dashboard", label: "Dashboard" },
-          { href: "/dashboard/profile", label: "Mon Profil" },
-          { href: "/dashboard/skills", label: "Compétences" },
-          { href: "/dashboard/experiences", label: "Expériences" },
-          { href: "/dashboard/education", label: "Diplômes" },
-          { href: "/dashboard/projects", label: "Projets" },
-        ].map((l) => (
-          <Link key={l.href} href={l.href} className="rounded-full border border-navy/10 bg-white px-3 py-1.5 text-xs font-medium text-navy/80 hover:bg-navy/5">
-            {l.label}
-          </Link>
-        ))}
-      </nav>
+      <main className="flex-1 p-6 lg:p-10">
+        <header className="flex flex-wrap items-center justify-between gap-3 mb-8">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-gelap-400 font-semibold">Tableau de bord</p>
+            <h1 className="text-3xl font-bold text-gelap">
+              Bonjour {profile.first_name ?? "à toi"} 👋
+            </h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link href={`/${profile.username}`} target="_blank" className="btn-ghost text-xs">
+              Voir mon TrustLink ↗
+            </Link>
+            <LogoutButton />
+          </div>
+        </header>
 
-      <main className="mt-8">
         <DashboardClient
-          profileId={profile.id}
           username={profile.username}
+          profile={profile}
+          completeness={completeness}
           initial={{
             skills: skills.data ?? [],
             experiences: experiences.data ?? [],
