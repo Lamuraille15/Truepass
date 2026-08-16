@@ -1,16 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import type {
-  Education,
-  Experience,
-  Project,
-  Skill,
-} from "@/lib/types";
+import type { Education, Experience, Project, Skill } from "@/lib/types";
+import { CompletenessDonut } from "@/components/CompletenessDonut";
 
 type Props = {
-  profileId: string;
   username: string;
+  profile: {
+    first_name: string | null;
+    last_name: string | null;
+    job_title: string | null;
+    bio: string | null;
+    location: string | null;
+    photo_url: string | null;
+  };
+  completeness: number;
   initial: {
     skills: Skill[];
     experiences: Experience[];
@@ -19,90 +23,67 @@ type Props = {
   };
 };
 
-export function DashboardClient({ profileId, username, initial }: Props) {
-  const trustUrl = `${
-    typeof window !== "undefined" ? window.location.origin : ""
-  }/${username}`;
+export function DashboardClient({ username, profile, completeness, initial }: Props) {
+  const stats = [
+    { label: "Projets réalisés", value: initial.projects.length },
+    { label: "Années d'expérience", value: "+" + Math.max(0, initial.experiences.length - 1) },
+    { label: "Compétences", value: initial.skills.length },
+    { label: "Diplômes", value: initial.education.length },
+  ];
+
+  const sections = [
+    { key: "info_base",      label: "Informations de base",  done: !!(profile.first_name && profile.job_title && profile.bio && profile.location) },
+    { key: "skills",         label: "Compétences",           done: initial.skills.length > 0 },
+    { key: "experiences",    label: "Expériences",           done: initial.experiences.length > 0 },
+    { key: "projects",       label: "Projets",               done: initial.projects.length > 0 },
+    { key: "education",      label: "Diplômes",              done: initial.education.length > 0 },
+  ];
 
   return (
-    <div className="space-y-8">
-      <section className="card">
-        <h2 className="text-lg font-semibold text-navy">Mon TrustLink</h2>
-        <p className="mt-1 text-sm text-navy/60">
-          Lien unique et public de ton passeport numérique.
-        </p>
-        <div className="mt-4 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-          <code className="flex-1 truncate rounded-md bg-navy/5 px-3 py-2 font-mono text-sm text-navy">
-            /{username}
-          </code>
-          <Link href={`/${username}`} target="_blank" className="btn-gold py-2 text-xs">
-            Ouvrir la page publique
-          </Link>
+    <div className="space-y-6">
+      <section className="card-light flex flex-col md:flex-row gap-6 md:items-center">
+        <CompletenessDonut value={completeness} />
+        <div className="flex-1">
+          <p className="text-xs uppercase tracking-widest text-gelap-400 font-semibold">Complétude du profil</p>
+          <h2 className="mt-1 text-2xl font-bold text-gelap">
+            {profile.first_name ?? "Complète ton"} {profile.last_name ?? "profil"}
+          </h2>
+          {profile.job_title && <p className="mt-1 text-gelap-500">{profile.job_title}{profile.location ? ` · 📍 ${profile.location}` : ""}</p>}
+          {profile.bio && <p className="mt-3 text-sm text-gelap-700 leading-relaxed line-clamp-3">{profile.bio}</p>}
+          <div className="mt-4 flex gap-2">
+            <Link href="/dashboard/profile" className="btn-primary text-xs">Modifier le profil</Link>
+            <Link href={`/${username}`} target="_blank" className="btn-ghost text-xs">Aperçu du lien</Link>
+          </div>
         </div>
       </section>
 
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <SummaryCard
-          label="Compétences"
-          count={initial.skills.length}
-          href="/dashboard/skills"
-          hint="Marketing, dev, design..."
-        />
-        <SummaryCard
-          label="Expériences"
-          count={initial.experiences.length}
-          href="/dashboard/experiences"
-          hint="Poste, entreprise, dates"
-        />
-        <SummaryCard
-          label="Diplômes"
-          count={initial.education.length}
-          href="/dashboard/education"
-          hint="École, diplôme, année"
-        />
-        <SummaryCard
-          label="Projets"
-          count={initial.projects.length}
-          href="/dashboard/projects"
-          hint="Réalisations et liens"
-        />
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {stats.map((s) => (
+          <div key={s.label} className="card-light text-center">
+            <div className="text-3xl font-extrabold text-gelap">{s.value}</div>
+            <div className="mt-1 text-xs uppercase tracking-wide text-gelap-500 font-semibold">{s.label}</div>
+          </div>
+        ))}
       </section>
 
-      <section className="card">
-        <h3 className="text-base font-semibold text-navy">Conseil</h3>
-        <p className="mt-2 text-sm text-navy/70">
-          Plus ton profil est renseigné, plus ton TrustLink inspire confiance. Commence par
-          la photo, le titre et la bio dans « Mon Profil », puis ajoute au moins une
-          expérience et trois compétences.
-        </p>
+      <section className="card-light">
+        <p className="text-xs uppercase tracking-widest text-gelap-400 font-semibold mb-3">Sections complétées</p>
+        <ul className="space-y-2">
+          {sections.map((s) => (
+            <li key={s.key} className="flex items-center justify-between rounded-xl bg-gelap-soft px-4 py-3">
+              <span className="flex items-center gap-3">
+                <span className={"grid h-6 w-6 place-items-center rounded-full " + (s.done ? "bg-brand text-white" : "bg-gelap-line text-gelap-400")}>
+                  {s.done ? "✓" : ""}
+                </span>
+                <span className="text-sm font-semibold text-gelap">{s.label}</span>
+              </span>
+              <Link href={`/dashboard/${s.key === "info_base" ? "profile" : s.key}`} className="text-xs font-semibold text-brand-dark hover:underline">
+                {s.done ? "Modifier" : "Compléter →"}
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
-      {/* silence unused */}
-      <span className="hidden">{profileId}{trustUrl}</span>
     </div>
-  );
-}
-
-function SummaryCard({
-  label,
-  count,
-  href,
-  hint,
-}: {
-  label: string;
-  count: number;
-  href: string;
-  hint: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="card flex flex-col gap-1 transition hover:border-gold/40 hover:shadow-md"
-    >
-      <span className="text-xs font-semibold uppercase tracking-wide text-gold-dark">
-        {label}
-      </span>
-      <span className="text-2xl font-bold text-navy">{count}</span>
-      <span className="text-xs text-navy/60">{hint}</span>
-    </Link>
   );
 }
