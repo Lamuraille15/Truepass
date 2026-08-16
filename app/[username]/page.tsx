@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createServer } from "@/lib/supabase/server";
 import { PublicActions } from "./PublicActions";
@@ -133,7 +134,7 @@ export default async function PublicProfilePage({ params }: Params) {
 
         <footer className="border-t border-gelap-line bg-gelap-soft px-6 py-5 text-center">
           <p className="text-xs text-gelap-500">
-            Propulsé par <Link className="font-bold text-brand-dark hover:underline">TruePass</Link> · One Link. Trusted Identity.
+            Propulsé par <span className="font-bold text-brand-dark">TruePass</span> · One Link. Trusted Identity.
           </p>
         </footer>
       </article>
