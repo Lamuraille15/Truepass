@@ -5,20 +5,30 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        navy: {
-          DEFAULT: "#0b1733",
-          light: "#13224a",
-          dark: "#06102a",
+        brand: {
+          DEFAULT: "#10B981",
+          light: "#34D399",
+          dark: "#059669",
+          50: "#ECFDF5",
+          100: "#D1FAE5",
         },
-        gold: {
-          DEFAULT: "#d4af37",
-          light: "#e8c871",
-          dark: "#a8841e",
+        accent: {
+          DEFAULT: "#EC4899",
         },
+        gelap: {
+          DEFAULT: "#0a0a0a",
+          50:  "#171717",
+          100: "#1f1f1f",
+          200: "#262626",
+          300: "#404040",
+          400: "#525252",
+          500: "#737373",
+        },
+        navy:  { DEFAULT: "#0b1733" },
+        gold:  { DEFAULT: "#d4af37" },
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        serif: ["Georgia", "serif"],
+        sans: ["Poppins", "system-ui", "sans-serif"],
       },
     },
   },
