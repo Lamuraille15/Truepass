@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
-export function PublicActions({ username, emailFallback }: { username: string; emailFallback: string }) {
+export function PublicActions({ username, fullName }: { username: string; fullName: string }) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -18,33 +19,48 @@ export function PublicActions({ username, emailFallback }: { username: string; e
 
   async function share() {
     const url = `${window.location.origin}/${username}`;
-    if (typeof navigator !== "undefined" && (navigator as Navigator & { share?: (data: { title: string; text: string; url: string }) => Promise<void> }).share) {
+    const nav = navigator as Navigator & { share?: (d: { title: string; text: string; url: string }) => Promise<void> };
+    if (nav.share) {
       try {
-        await (navigator as Navigator & { share: (data: { title: string; text: string; url: string }) => Promise<void> }).share({
-          title: "Mon TrustLink",
+        await nav.share({
+          title: `${fullName} — TruePass`,
           text: "Découvre mon profil TruePass",
           url,
         });
         return;
-      } catch { /* user-cancelled */ }
+      } catch {
+        /* utilisateur a annulé */
+      }
     }
     copy();
   }
 
-  function downloadCV() {
-    window.print();
-  }
+  const contactSubject = encodeURIComponent(`Contact depuis TruePass — ${fullName}`);
 
   return (
-    <div className="no-print mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-navy/10 bg-white p-3 shadow-sm">
-      <div className="text-sm text-navy/70">
-        TrustLink : <code className="rounded bg-navy/5 px-1.5 py-0.5 font-mono text-navy">/{username}</code>
-      </div>
+    <div className="no-print mx-auto mb-4 flex max-w-4xl flex-wrap items-center justify-between gap-3 rounded-2xl bg-white border border-gelap-line px-4 py-3 shadow-soft">
+      <Link href="/" className="flex items-center gap-2">
+        <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand">
+          <span className="font-extrabold text-lg text-white">T</span>
+        </span>
+        <span className="font-bold text-gelap">TruePass</span>
+        <code className="ml-3 hidden md:inline rounded bg-gelap-soft px-2 py-0.5 font-mono text-xs text-gelap-500">
+          /{username}
+        </code>
+      </Link>
       <div className="flex flex-wrap gap-2">
-        <button onClick={copy} className="btn-ghost py-2 text-xs">{copied ? "Lien copié ✓" : "Copier le lien"}</button>
-        <button onClick={share} className="btn-ghost py-2 text-xs">Partager</button>
-        <button onClick={downloadCV} className="btn-gold py-2 text-xs">Télécharger le CV (PDF)</button>
-        <a href={emailFallback} className="btn-primary py-2 text-xs">Contacter</a>
+        <button onClick={copy} className="btn-ghost py-2 text-xs">
+          {copied ? "✓ Copié" : "Copier"}
+        </button>
+        <button onClick={share} className="btn-ghost py-2 text-xs">
+          Partager
+        </button>
+        <button onClick={() => window.print()} className="btn-soft py-2 text-xs">
+          Télécharger le CV (PDF)
+        </button>
+        <a href={`mailto:?subject=${contactSubject}`} className="btn-primary py-2 text-xs">
+          Contacter
+        </a>
       </div>
     </div>
   );
