@@ -12,7 +12,7 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "TruePass — Votre identité. Votre confiance.",
   description:
-    "Permettre à chacun de prouver qui il est, ce qu'il sait faire et ce qui l'a accompli, en gardant le contrôle total de ses données.",
+    "Permettre à chacun de prouver qui il est, ce qu'il sait faire et ce qui l'a accompli.",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL
       ? `https://${process.env.NEXT_PUBLIC_SITE_URL}`
@@ -22,8 +22,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className="dark">
-      <body className={`${poppins.variable} min-h-screen bg-gelap text-white antialiased`}>
+    <html lang="fr">
+      <body className={`${poppins.variable} min-h-screen bg-white text-gelap`}>
         {children}
       </body>
     </html>
