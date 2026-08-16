@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-poppins",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "TruePass — One Link. Trusted Identity.",
+  title: "TruePass — Votre identité. Votre confiance.",
   description:
-    "Ton identité professionnelle en un seul lien. Crée ton TrustLink et partage ton passeport numérique.",
+    "Permettre à chacun de prouver qui il est, ce qu'il sait faire et ce qui l'a accompli, en gardant le contrôle total de ses données.",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL
       ? `https://${process.env.NEXT_PUBLIC_SITE_URL}`
@@ -14,8 +22,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr">
-      <body className="min-h-screen bg-white text-navy">
+    <html lang="fr" className="dark">
+      <body className={`${poppins.variable} min-h-screen bg-gelap text-white antialiased`}>
         {children}
       </body>
     </html>
