@@ -15,19 +15,20 @@ export function ExperiencesClient({ profileId, initial }: { profileId: string; i
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fonction pour nettoyer et adapter la date au format SQL AAAA-MM-JJ
+  // Étape 1 : Transforme le format de l'input (AAAA-MM) en format SQL (AAAA-MM-JJ) pour Supabase
   function cleanDateForSQL(dateStr: string) {
-    if (!dateStr) return null;
-    // Si la date contient déjà le jour (contient deux tirets), on la garde telle quelle
+    if (!dateStr || !dateStr.trim()) return null;
+    // Si la date contient déjà le jour (contient deux tirets), on la garde
     if (dateStr.split("-").length === 3) return dateStr;
-    // Sinon on ajoute le premier jour du mois
+    // Sinon on ajoute le premier jour du mois par défaut pour faire plaisir à Supabase
     return `${dateStr}-01`;
   }
 
-  // Fonction pour adapter la date SQL (AAAA-MM-JJ) vers l'input type="month" (AAAA-MM)
+  // Étape 2 : CORRECTION ICI ! Transforme le format SQL (AAAA-MM-JJ) en format lisible pour l'input HTML (AAAA-MM)
   function cleanDateForInput(dateStr: string | null) {
     if (!dateStr) return "";
     const parts = dateStr.split("-");
+    // parts[0] = Année (AAAA), parts[1] = Mois (MM)
     if (parts.length >= 2) return `${parts[0]}-${parts[1]}`;
     return dateStr;
   }
@@ -127,10 +128,13 @@ function fmtRange(start: string | null, end: string | null) {
   return `${s} → ${e}`;
 }
 
+// Étape 3 : CORRECTION ICI AUSSI ! Affiche proprement la date sous la forme MM/AAAA dans la liste
 function fmtMonth(v: string) {
+  if (!v) return v;
   const parts = v.split("-");
   const y = parts[0];
   const m = parts[1];
   if (!y || !m) return v;
   return `${m}/${y}`;
 }
+
