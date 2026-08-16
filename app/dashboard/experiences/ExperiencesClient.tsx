@@ -15,6 +15,23 @@ export function ExperiencesClient({ profileId, initial }: { profileId: string; i
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Fonction pour nettoyer et adapter la date au format SQL AAAA-MM-JJ
+  function cleanDateForSQL(dateStr: string) {
+    if (!dateStr) return null;
+    // Si la date contient déjà le jour (contient deux tirets), on la garde telle quelle
+    if (dateStr.split("-").length === 3) return dateStr;
+    // Sinon on ajoute le premier jour du mois
+    return `${dateStr}-01`;
+  }
+
+  // Fonction pour adapter la date SQL (AAAA-MM-JJ) vers l'input type="month" (AAAA-MM)
+  function cleanDateForInput(dateStr: string | null) {
+    if (!dateStr) return "";
+    const parts = dateStr.split("-");
+    if (parts.length >= 2) return `${parts[0]}-${parts[1]}`;
+    return dateStr;
+  }
+
   async function save() {
     if (!form.position.trim() || !form.company.trim()) {
       setError("Poste et entreprise sont requis.");
@@ -22,14 +39,16 @@ export function ExperiencesClient({ profileId, initial }: { profileId: string; i
     }
     setSaving(true);
     setError(null);
+
     const payload = {
       profile_id: profileId,
       position: form.position.trim(),
       company: form.company.trim(),
       description: form.description.trim() || null,
-      start_date: form.start_date || null,
-      end_date: form.end_date || null,
+      start_date: cleanDateForSQL(form.start_date),
+      end_date: cleanDateForSQL(form.end_date),
     };
+
     if (editing) {
       const { data, error } = await supabase.from("experiences").update(payload).eq("id", editing).select().single();
       setSaving(false);
@@ -56,8 +75,8 @@ export function ExperiencesClient({ profileId, initial }: { profileId: string; i
       position: e.position,
       company: e.company,
       description: e.description ?? "",
-      start_date: e.start_date ?? "",
-      end_date: e.end_date ?? "",
+      start_date: cleanDateForInput(e.start_date),
+      end_date: cleanDateForInput(e.end_date),
     });
   }
 
@@ -107,8 +126,11 @@ function fmtRange(start: string | null, end: string | null) {
   const e = end ? fmtMonth(end) : "aujourd'hui";
   return `${s} → ${e}`;
 }
+
 function fmtMonth(v: string) {
-  const [y, m] = v.split("-");
+  const parts = v.split("-");
+  const y = parts[0];
+  const m = parts[1];
   if (!y || !m) return v;
   return `${m}/${y}`;
 }
