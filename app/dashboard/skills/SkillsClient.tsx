@@ -1,55 +1,44 @@
 "use client";
-
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Skill } from "@/lib/types";
 
 export function SkillsClient({ profileId, initial }: { profileId: string; initial: Skill[] }) {
   const supabase = createClient();
-  const [items, setItems] = useState<Skill[]>(initial);
-  const [value, setValue] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [items, setItems] = useState(initial);
+  const [val, setVal] = useState("");
+  const [busy, setBusy] = useState(false);
 
   async function add() {
-    const v = value.trim();
-    if (!v) return;
-    setError(null);
-    setSaving(true);
-    const { data, error } = await supabase
-      .from("skills").insert({ profile_id: profileId, skill: v }).select().single();
-    setSaving(false);
-    if (error) { setError(error.message); return; }
-    if (data) setItems([data, ...items]);
-    setValue("");
+    const v = val.trim(); if (!v || busy) return;
+    setBusy(true);
+    const { data, error } = await supabase.from("skills").insert({ profile_id: profileId, skill: v }).select().single();
+    setBusy(false);
+    if (error) return;
+    setItems([...items, data]);
+    setVal("");
   }
-
   async function remove(id: string) {
-    setItems(items.filter((i) => i.id !== id));
+    setItems(items.filter((x) => x.id !== id));
     await supabase.from("skills").delete().eq("id", id);
   }
 
   return (
-    <div className="card space-y-6">
+    <div className="card-light">
       <div className="flex gap-2">
-        <input
-          className="input"
-          placeholder="ex. Marketing, Développement web..."
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); add(); } }}
-        />
-        <button onClick={add} disabled={saving} className="btn-primary">Ajouter</button>
+        <input className="input-light" placeholder="ex: React, Figma, Marketing" value={val}
+          onChange={(e) => setVal(e.target.value)} onKeyDown={(e) => e.key === "Enter" && add()} />
+        <button onClick={add} disabled={busy || !val.trim()} className="btn-primary">Ajouter</button>
       </div>
-      {error && <p className="text-sm text-red-700">{error}</p>}
-      <ul className="flex flex-wrap gap-2">
-        {items.length === 0 && <li className="text-sm text-navy/50">Aucune compétence pour l'instant.</li>}
-        {items.map((s) => (
-          <li key={s.id} className="inline-flex items-center gap-2 rounded-full border border-navy/15 bg-navy/5 px-3 py-1 text-sm text-navy">
-            {s.skill}
-            <button onClick={() => remove(s.id)} className="text-navy/40 hover:text-red-600" aria-label="Supprimer">×</button>
-          </li>
-        ))}
+      <ul className="mt-6 flex flex-wrap gap-2">
+        {items.length === 0 ? <li className="text-sm text-gelap-400">Aucune compétence ajoutée.</li> :
+          items.map((s) => (
+            <li key={s.id} className="inline-flex items-center gap-2 rounded-xl bg-brand-50 px-3 py-1.5 text-sm font-bold text-brand-dark">
+              {s.skill}
+              <button onClick={() => remove(s.id)} className="font-bold text-gelap-500 hover:text-red-600">×</button>
+            </li>
+          ))
+        }
       </ul>
     </div>
   );

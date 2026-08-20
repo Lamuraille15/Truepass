@@ -10,9 +10,9 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "TruePass — Votre identité. Votre confiance.",
+  title: "truepass — Votre identité. Votre confiance.",
   description:
-    "Permettre à chacun de prouver qui il est, ce qu'il sait faire et ce qui l'a accompli.",
+    "Permettre à chacun de prouver qui il est, ce qu'il sait faire et ce qu'il a accompli, en gardant le contrôle total de ses données.",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL
       ? `https://${process.env.NEXT_PUBLIC_SITE_URL}`

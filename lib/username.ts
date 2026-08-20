@@ -1,5 +1,7 @@
-// Slugify/normalize a username candidate to fit profiles.username rules.
-const RESERVED = new Set(["admin", "api", "auth", "dashboard", "login", "signup", "logout", "settings"]);
+const RESERVED = new Set([
+  "admin", "api", "auth", "dashboard", "login", "signup", "logout",
+  "settings", "trustees", "trustlink", "truepass",
+]);
 
 export function normalizeUsername(input: string): string {
   const base = (input || "")

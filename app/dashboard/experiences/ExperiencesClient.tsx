@@ -1,140 +1,59 @@
 "use client";
-
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Experience } from "@/lib/types";
 
-type Form = { position: string; company: string; description: string; start_date: string; end_date: string };
-const empty = (): Form => ({ position: "", company: "", description: "", start_date: "", end_date: "" });
+type Draft = { position: string; company: string; description: string; start_date: string; end_date: string; ongoing: boolean };
+const empty: Draft = { position: "", company: "", description: "", start_date: "", end_date: "", ongoing: false };
 
 export function ExperiencesClient({ profileId, initial }: { profileId: string; initial: Experience[] }) {
   const supabase = createClient();
-  const [items, setItems] = useState<Experience[]>(initial);
-  const [form, setForm] = useState<Form>(empty());
-  const [editing, setEditing] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [items, setItems] = useState(initial);
+  const [draft, setDraft] = useState<Draft>(empty);
+  const [busy, setBusy] = useState(false);
 
-  // Étape 1 : Transforme le format de l'input (AAAA-MM) en format SQL (AAAA-MM-JJ) pour Supabase
-  function cleanDateForSQL(dateStr: string) {
-    if (!dateStr || !dateStr.trim()) return null;
-    // Si la date contient déjà le jour (contient deux tirets), on la garde
-    if (dateStr.split("-").length === 3) return dateStr;
-    // Sinon on ajoute le premier jour du mois par défaut pour faire plaisir à Supabase
-    return `${dateStr}-01`;
+  async function add() {
+    if (!draft.position || !draft.company || busy) return;
+    setBusy(true);
+    const payload = { profile_id: profileId, position: draft.position, company: draft.company, description: draft.description || null,
+      start_date: draft.start_date || null, end_date: draft.ongoing ? null : (draft.end_date || null) };
+    const { data, error } = await supabase.from("experiences").insert(payload).select().single();
+    setBusy(false);
+    if (error) return;
+    setItems([data, ...items]); setDraft(empty);
   }
-
-  // Étape 2 : CORRECTION ICI ! Transforme le format SQL (AAAA-MM-JJ) en format lisible pour l'input HTML (AAAA-MM)
-  function cleanDateForInput(dateStr: string | null) {
-    if (!dateStr) return "";
-    const parts = dateStr.split("-");
-    // parts[0] = Année (AAAA), parts[1] = Mois (MM)
-    if (parts.length >= 2) return `${parts[0]}-${parts[1]}`;
-    return dateStr;
-  }
-
-  async function save() {
-    if (!form.position.trim() || !form.company.trim()) {
-      setError("Poste et entreprise sont requis.");
-      return;
-    }
-    setSaving(true);
-    setError(null);
-
-    const payload = {
-      profile_id: profileId,
-      position: form.position.trim(),
-      company: form.company.trim(),
-      description: form.description.trim() || null,
-      start_date: cleanDateForSQL(form.start_date),
-      end_date: cleanDateForSQL(form.end_date),
-    };
-
-    if (editing) {
-      const { data, error } = await supabase.from("experiences").update(payload).eq("id", editing).select().single();
-      setSaving(false);
-      if (error) { setError(error.message); return; }
-      if (data) setItems(items.map((i) => (i.id === editing ? data : i)));
-      setEditing(null);
-    } else {
-      const { data, error } = await supabase.from("experiences").insert(payload).select().single();
-      setSaving(false);
-      if (error) { setError(error.message); return; }
-      if (data) setItems([data, ...items]);
-    }
-    setForm(empty());
-  }
-
   async function remove(id: string) {
-    setItems(items.filter((i) => i.id !== id));
+    setItems(items.filter((x) => x.id !== id));
     await supabase.from("experiences").delete().eq("id", id);
   }
 
-  function startEdit(e: Experience) {
-    setEditing(e.id);
-    setForm({
-      position: e.position,
-      company: e.company,
-      description: e.description ?? "",
-      start_date: cleanDateForInput(e.start_date),
-      end_date: cleanDateForInput(e.end_date),
-    });
-  }
-
   return (
-    <div className="space-y-8">
-      <div className="card space-y-4">
-        <h2 className="text-base font-semibold text-navy">{editing ? "Modifier" : "Ajouter"} une expérience</h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div><label className="label">Poste</label><input className="input" value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} /></div>
-          <div><label className="label">Entreprise</label><input className="input" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} /></div>
-          <div><label className="label">Début</label><input type="month" className="input" value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} /></div>
-          <div><label className="label">Fin (vide si en poste)</label><input type="month" className="input" value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} /></div>
+    <>
+      <form onSubmit={(e) => { e.preventDefault(); add(); }} className="card-light space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div><label className="label-light">Poste</label><input className="input-light" value={draft.position} onChange={(e) => setDraft({ ...draft, position: e.target.value })} placeholder="Frontend Developer" /></div>
+          <div><label className="label-light">Entreprise</label><input className="input-light" value={draft.company} onChange={(e) => setDraft({ ...draft, company: e.target.value })} placeholder="TechCorp" /></div>
+          <div><label className="label-light">Date de début</label><input type="date" className="input-light" value={draft.start_date} onChange={(e) => setDraft({ ...draft, start_date: e.target.value })} /></div>
+          <div><label className="label-light">Date de fin</label><input type="date" className="input-light" disabled={draft.ongoing} value={draft.end_date} onChange={(e) => setDraft({ ...draft, end_date: e.target.value })} /></div>
         </div>
-        <div>
-          <label className="label">Description</label>
-          <textarea className="input min-h-[100px]" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-        </div>
-        {error && <p className="text-sm text-red-700">{error}</p>}
-        <div className="flex justify-end gap-2">
-          {editing && <button type="button" onClick={() => { setEditing(null); setForm(empty()); }} className="btn-ghost">Annuler</button>}
-          <button onClick={save} disabled={saving} className="btn-primary">{saving ? "Enregistrement..." : editing ? "Mettre à jour" : "Ajouter"}</button>
-        </div>
-      </div>
-
-      <ul className="space-y-3">
-        {items.length === 0 && <li className="text-sm text-navy/50">Aucune expérience.</li>}
+        <label className="flex items-center gap-2 text-sm text-gelap-700"><input type="checkbox" className="checkbox-brand" checked={draft.ongoing} onChange={(e) => setDraft({ ...draft, ongoing: e.target.checked })} /> En cours</label>
+        <div><label className="label-light">Description</label><textarea className="input-light min-h-[100px]" value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} /></div>
+        <div className="flex justify-end"><button type="submit" disabled={busy} className="btn-primary">{busy ? "Ajout..." : "Ajouter"}</button></div>
+      </form>
+      <ul className="mt-6 space-y-3">
         {items.map((e) => (
-          <li key={e.id} className="card flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+          <li key={e.id} className="card-light flex justify-between gap-4">
             <div>
-              <div className="text-base font-semibold text-navy">{e.position} <span className="text-navy/40">·</span> {e.company}</div>
-              <div className="text-xs text-navy/60">{fmtRange(e.start_date, e.end_date)}</div>
-              {e.description && <p className="mt-2 text-sm text-navy/80 whitespace-pre-line">{e.description}</p>}
+              <div className="text-sm font-bold text-gelap">{e.position} <span className="text-gelap-500 font-normal">· {e.company}</span></div>
+              <div className="text-[11px] uppercase tracking-widest text-gelap-500 font-bold mt-1">
+                {(e.start_date ?? "—").slice(0, 7)} → {e.end_date ? e.end_date.slice(0, 7) : "aujourd'hui"}
+              </div>
+              {e.description && <p className="mt-2 text-sm text-gelap-700 whitespace-pre-line">{e.description}</p>}
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => startEdit(e)} className="btn-ghost py-1.5 text-xs">Modifier</button>
-              <button onClick={() => remove(e.id)} className="btn-ghost py-1.5 text-xs hover:border-red-300 hover:text-red-700">Supprimer</button>
-            </div>
+            <button onClick={() => remove(e.id)} className="btn-danger self-start">Supprimer</button>
           </li>
         ))}
       </ul>
-    </div>
+    </>
   );
 }
-
-function fmtRange(start: string | null, end: string | null) {
-  const s = start ? fmtMonth(start) : "—";
-  const e = end ? fmtMonth(end) : "aujourd'hui";
-  return `${s} → ${e}`;
-}
-
-// Étape 3 : CORRECTION ICI AUSSI ! Affiche proprement la date sous la forme MM/AAAA dans la liste
-function fmtMonth(v: string) {
-  if (!v) return v;
-  const parts = v.split("-");
-  const y = parts[0];
-  const m = parts[1];
-  if (!y || !m) return v;
-  return `${m}/${y}`;
-}
-

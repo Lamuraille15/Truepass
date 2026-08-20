@@ -47,3 +47,17 @@ export type PublicProfile = Profile & {
   education: Education[];
   projects: Project[];
 };
+
+export type TrustLinkConfig = {
+  id: string;
+  user_id: string;
+  username: string;
+  expires_in_days: number;
+  password_protected: boolean;
+  show_info: boolean;
+  show_skills: boolean;
+  show_projects: boolean;
+  show_experiences: boolean;
+  show_documents: boolean;
+  show_testimonials: boolean;
+};
