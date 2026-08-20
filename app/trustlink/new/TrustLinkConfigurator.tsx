@@ -22,18 +22,34 @@ export function TrustLinkConfigurator({ username, fullName, photoUrl, jobTitle }
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [generated, setGenerated] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const url = `${typeof window !== "undefined" ? window.location.origin : ""}/${username}`;
+  const publicPath = `/${username}`;
 
   async function generate() {
     setLoading(true);
-    await fetch("/api/trustlink/create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ enabled, expires_in_days: days, password_protected: !!password }),
-    });
-    setLoading(false);
-    setGenerated(true);
+    setErrorMsg(null);
+    try {
+      const res = await fetch("/api/trustlink/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          enabled,
+          expires_in_days: days,
+          password_protected: !!password,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || `Erreur ${res.status}`);
+      }
+      setGenerated(true);
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Erreur inconnue");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -46,6 +62,43 @@ export function TrustLinkConfigurator({ username, fullName, photoUrl, jobTitle }
         </div>
         <Link href="/dashboard" className="btn-ghost text-xs">← Retour</Link>
       </header>
+
+      {/* BANNIÈRE DE SUCCÈS — apparaît après génération */}
+      {generated && (
+        <div className="max-w-6xl mx-auto mb-6 rounded-2xl border-2 border-brand bg-brand-50 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-brand text-white font-extrabold">✓</span>
+              <h2 className="text-base font-extrabold text-brand-dark">TrustLink généré avec succès</h2>
+            </div>
+            <p className="mt-2 text-sm text-gelap-700">
+              Ton lien est prêt. Partage l&apos;URL ci-dessous ou clique pour ouvrir ton profil public :
+            </p>
+            <code className="mt-2 inline-block break-all rounded-md bg-white border border-gelap-line px-3 py-1.5 font-mono text-sm text-gelap">
+              {url}
+            </code>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => navigator.clipboard?.writeText(url)}
+              className="btn-soft text-xs"
+            >
+              Copier
+            </button>
+            <Link href={publicPath} target="_blank" className="btn-primary text-xs">
+              Voir mon profil public ↗
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* BANNIÈRE D'ERREUR — apparaît si l'API refuse */}
+      {errorMsg && (
+        <div className="max-w-6xl mx-auto mb-6 rounded-2xl border-2 border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <strong>Erreur :</strong> {errorMsg}
+        </div>
+      )}
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Colonne gauche : configuration */}
@@ -92,7 +145,7 @@ export function TrustLinkConfigurator({ username, fullName, photoUrl, jobTitle }
             </div>
           </div>
 
-          <button onClick={generate} disabled={loading || generated} className="btn-primary w-full py-3.5 text-base">
+          <button onClick={generate} disabled={loading} className="btn-primary w-full py-3.5 text-base">
             {loading ? "Génération..." : generated ? "✓ TrustLink généré" : "Générer mon TrustLink"}
           </button>
         </section>
@@ -111,7 +164,6 @@ function PhoneMockup({ fullName, jobTitle, photoUrl, enabled, url }: { fullName:
   return (
     <div className="mx-auto max-w-[260px]">
       <div className="rounded-[32px] border-2 border-gelap-200 bg-gelap overflow-hidden shadow-card">
-        {/* Status bar */}
         <div className="flex items-center justify-between px-5 py-2 text-[10px] text-gelap-400">
           <span className="font-bold">9:41</span>
           <span className="flex gap-1"><span>◐</span><span>▮▮▮</span></span>
