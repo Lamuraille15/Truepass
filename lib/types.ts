@@ -41,11 +41,21 @@ export type Project = {
   url: string | null;
 };
 
+export type Review = {
+  id: string;
+  profile_id: string;
+  author: string;
+  content: string;
+  rating: number;
+  created_at?: string;
+};
+
 export type PublicProfile = Profile & {
   skills: Skill[];
   experiences: Experience[];
   education: Education[];
   projects: Project[];
+  reviews: Review[];          // 👈 la ligne manquante
 };
 
 export type TrustLinkConfig = {
