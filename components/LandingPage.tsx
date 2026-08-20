@@ -59,66 +59,6 @@ export function LandingPage() {
         </p>
       </section>
 
-      {/* LANGUES */}
-      <section className="px-6 py-10 max-w-4xl mx-auto">
-        <div className="text-xs uppercase tracking-widest text-brand font-bold">Choisissez votre langue</div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {[
-            { l: "Français",  active: true },
-            { l: "English",   active: false },
-            { l: "Español",   active: false },
-            { l: "Português", active: false },
-            { l: "العربية",   active: false },
-          ].map((x) => (
-            <button key={x.l} type="button"
-              className={
-                "px-4 py-2 rounded-full border-2 text-sm font-bold transition " +
-                (x.active
-                  ? "bg-brand text-gelap border-brand"
-                  : "border-gelap-300 text-white hover:border-brand hover:text-brand")
-              }>
-              {x.l}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* COULEURS */}
-      <section className="px-6 py-10 max-w-4xl mx-auto">
-        <div className="text-xs uppercase tracking-widest text-brand font-bold">Couleurs</div>
-        <div className="mt-4 flex flex-wrap gap-4">
-          {[
-            { label: "Brand",  hex: "#10B981" },
-            { label: "Accent", hex: "#EC4899" },
-            { label: "Dark",   hex: "#0a0a0a" },
-            { label: "Light",  hex: "#F4F4F5" },
-            { label: "Gray",   hex: "#737373" },
-          ].map((c) => (
-            <div key={c.label} className="flex items-center gap-2 rounded-xl border border-gelap-100 px-3 py-2">
-              <span className="h-10 w-10 rounded-lg border border-gelap-200" style={{ background: c.hex }} />
-              <div className="text-xs">
-                <div className="font-bold text-white">{c.label}</div>
-                <div className="text-gelap-400 font-mono">{c.hex}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* TYPOGRAPHIE */}
-      <section className="px-6 py-10 max-w-4xl mx-auto">
-        <div className="text-xs uppercase tracking-widest text-brand font-bold">Typographie</div>
-        <div className="mt-4 rounded-2xl border border-gelap-100 bg-gelap-50 p-10">
-          <div className="text-8xl font-extrabold leading-none text-white">Aa</div>
-          <div className="mt-4 text-2xl font-bold text-white">Poppins</div>
-          <div className="mt-2 text-xs text-gelap-400 font-mono">
-            ABCDEFGHIJKLMNOPQRSTUVWXYZ<br />
-            abcdefghijklmnopqrstuvwxyz<br />
-            0123456789
-          </div>
-        </div>
-      </section>
-
       {/* POURQUOI truepass */}
       <section className="px-6 py-16 max-w-6xl mx-auto">
         <div className="text-xs uppercase tracking-widest text-brand font-bold text-center">Pourquoi truepass ?</div>
