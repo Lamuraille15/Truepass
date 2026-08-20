@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createServer } from "@/lib/supabase/server";
 import { PublicActions } from "./PublicActions";
+import { PrintButton } from "./PrintButton";
 import type { Metadata } from "next";
 import type { PublicProfile } from "@/lib/types";
 
@@ -42,7 +43,7 @@ export default async function PublicProfilePage({ params }: Params) {
   if (!profile) notFound();
   const fullName = [profile.first_name, profile.last_name].filter(Boolean).join(" ").trim() || profile.username;
   const init = (profile.first_name ?? profile.username).charAt(0).toUpperCase();
-  const reviews = (profile as PublicProfile & { reviews: { id: string; author: string; content: string; rating: number }[] }).reviews ?? [];
+  const reviews = profile.reviews ?? [];
 
   return (
     <main className="min-h-screen bg-gelap-soft">
@@ -82,10 +83,7 @@ export default async function PublicProfilePage({ params }: Params) {
                className="inline-flex items-center justify-center rounded-xl bg-brand px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark">
               Contacter
             </a>
-            <button onClick={() => window.print()}
-               className="inline-flex items-center justify-center rounded-xl border-2 border-gelap-200 px-5 py-2.5 text-sm font-bold text-gelap-300 transition hover:border-brand hover:text-brand">
-              Télécharger le CV ↗
-            </button>
+            <PrintButton />
           </div>
         </header>
 
