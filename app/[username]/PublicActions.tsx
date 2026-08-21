@@ -2,7 +2,9 @@
 import { useState } from "react";
 import Link from "next/link";
 
-export function PublicActions({ username, fullName }: { username: string; fullName: string }) {
+export function PublicActions({ username, fullName, contactEmail }: {
+  username: string; fullName: string; contactEmail: string | null;
+}) {
   const [copied, setCopied] = useState(false);
   async function copy() {
     const url = `${window.location.origin}/${username}`;
@@ -17,6 +19,10 @@ export function PublicActions({ username, fullName }: { username: string; fullNa
     }
     copy();
   }
+  const mailto = contactEmail
+    ? `mailto:${contactEmail}?subject=${encodeURIComponent("Contact depuis truepass — " + fullName)}`
+    : `mailto:?subject=${encodeURIComponent("Contact depuis truepass — " + fullName)}`;
+
   return (
     <div className="no-print mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-3 rounded-2xl bg-white border border-gelap-line px-5 py-4 shadow-card mt-6">
       <Link href="/" className="flex items-center gap-3">
@@ -30,7 +36,7 @@ export function PublicActions({ username, fullName }: { username: string; fullNa
         <button onClick={copy} className="btn-ghost text-xs">{copied ? "✓ Copié" : "Copier"}</button>
         <button onClick={share} className="btn-ghost text-xs">Partager</button>
         <button onClick={() => window.print()} className="btn-soft text-xs">Télécharger le CV (PDF)</button>
-        <a href={`mailto:?subject=${encodeURIComponent("Contact depuis truepass — " + fullName)}`} className="btn-primary text-xs">Contacter</a>
+        <a href={mailto} className="btn-primary text-xs">Contacter</a>
       </div>
     </div>
   );
