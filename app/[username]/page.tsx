@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createServer } from "@/lib/supabase/server";
 import { PublicActions } from "./PublicActions";
-import { PrintButton } from "./PrintButton";
 import type { Metadata } from "next";
 import type { PublicProfile } from "@/lib/types";
 
@@ -44,14 +43,15 @@ export default async function PublicProfilePage({ params }: Params) {
   const fullName = [profile.first_name, profile.last_name].filter(Boolean).join(" ").trim() || profile.username;
   const init = (profile.first_name ?? profile.username).charAt(0).toUpperCase();
   const reviews = profile.reviews ?? [];
+  const contactEmail = (profile as { contact_email?: string | null }).contact_email ?? null;
 
   return (
     <main className="min-h-screen bg-gelap-soft">
-      <PublicActions username={profile.username} fullName={fullName} />
+      <PublicActions username={profile.username} fullName={fullName} contactEmail={contactEmail} />
 
       <article className="mx-auto max-w-4xl overflow-hidden rounded-2xl bg-white border border-gelap-line shadow-card mt-4">
-        {/* Cadran supérieur Premium Sombre */}
-        <header className="bg-gelap-surface text-white px-6 pt-8 pb-6 md:px-10 border-b border-brand/30">
+        {/* Cadran supérieur Premium Sombre — boutons Contacter/Télécharger RETIRÉS (uniquement dans PublicActions) */}
+        <header className="bg-gelap-surface text-white px-6 pt-8 pb-8 md:px-10 border-b border-brand/30">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
             <Link href="/" className="flex items-center gap-2">
               <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand text-gelap font-extrabold">T</span>
@@ -68,22 +68,14 @@ export default async function PublicProfilePage({ params }: Params) {
             </div>
             <div className="flex-1">
               <h1 className="text-3xl md:text-4xl font-extrabold text-white">{fullName}</h1>
-              {profile.job_title && <p className="mt-1 text-lg font-medium text-gelap-300">{profile.job_title}</p>}
-              <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-gelap-300">
+              {profile.job_title && <p className="mt-1 text-lg font-medium text-white/90">{profile.job_title}</p>}
+              <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-white/80">
                 {profile.location && <span>📍 {profile.location}</span>}
                 {profile.linkedin && <Link href={profile.linkedin} target="_blank" className="hover:text-brand transition">in/LinkedIn</Link>}
                 {profile.github && <Link href={profile.github} target="_blank" className="hover:text-brand transition">GitHub</Link>}
               </div>
-              {profile.bio && <p className="mt-4 max-w-2xl text-[15px] text-gelap-200 leading-relaxed whitespace-pre-line">{profile.bio}</p>}
+              {profile.bio && <p className="mt-4 max-w-2xl text-[15px] text-white/90 leading-relaxed whitespace-pre-line">{profile.bio}</p>}
             </div>
-          </div>
-
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <a href={`mailto:?subject=${encodeURIComponent("Contact truepass — " + fullName)}`}
-               className="inline-flex items-center justify-center rounded-xl bg-brand px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark">
-              Contacter
-            </a>
-            <PrintButton />
           </div>
         </header>
 
@@ -102,6 +94,21 @@ export default async function PublicProfilePage({ params }: Params) {
             </Section>
           )}
 
+          {/* Documents & Diplômes — NOUVEAU : jamais rendu avant */}
+          {profile.education.length > 0 && (
+            <Section title="Documents & Diplômes" subtitle="Parcours académique">
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {profile.education.map((e) => (
+                  <li key={e.id} className="rounded-2xl border border-gelap-line bg-white p-5 shadow-soft">
+                    <div className="text-base font-extrabold text-gelap">{e.degree}</div>
+                    <div className="mt-1 text-sm font-bold text-brand-dark">{e.school}</div>
+                    {e.year && <div className="mt-2 text-[11px] uppercase tracking-widest text-gelap-500 font-bold">{e.year}</div>}
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          )}
+
           {/* Expérience condensée */}
           {profile.experiences.length > 0 && (
             <Section title="Expérience" subtitle="Parcours">
@@ -115,8 +122,8 @@ export default async function PublicProfilePage({ params }: Params) {
                   <div className="text-xs uppercase tracking-widest text-gelap-500 font-bold mt-1">Projets menés</div>
                 </div>
                 <div className="rounded-xl bg-gelap-soft p-4">
-                  <div className="text-sm font-bold text-gelap">Disponible pour de nouvelles missions</div>
-                  <div className="text-xs text-gelap-500 mt-1">Réponse en moins de 24h</div>
+                  <div className="text-2xl font-extrabold text-gelap">{profile.education.length}</div>
+                  <div className="text-xs uppercase tracking-widest text-gelap-500 font-bold mt-1">Diplômes</div>
                 </div>
               </div>
               <ul className="mt-6 space-y-4">
