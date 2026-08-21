@@ -8,6 +8,8 @@ export function TestimonialsClient({ profileId, initial }: { profileId: string; 
   const [items, setItems] = useState(initial);
   const [d, setD] = useState({ author: "", content: "", rating: 5 });
   const [busy, setBusy] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [edit, setEdit] = useState({ author: "", content: "", rating: 5 });
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
@@ -21,6 +23,15 @@ export function TestimonialsClient({ profileId, initial }: { profileId: string; 
   async function remove(id: string) {
     setItems(items.filter((x) => x.id !== id));
     await supabase.from("testimonials").delete().eq("id", id);
+  }
+  function startEdit(r: Review) { setEditingId(r.id); setEdit({ author: r.author, content: r.content, rating: r.rating }); }
+  async function saveEdit(id: string) {
+    setBusy(true);
+    const { error } = await supabase.from("testimonials").update(edit).eq("id", id);
+    setBusy(false);
+    if (error) return;
+    setItems(items.map((x) => x.id === id ? { ...x, ...edit } : x));
+    setEditingId(null);
   }
 
   return (
@@ -41,12 +52,31 @@ export function TestimonialsClient({ profileId, initial }: { profileId: string; 
       <ul className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3">
         {items.map((r) => (
           <li key={r.id} className="card-light">
-            <div className="text-accent">{"★".repeat(r.rating)}<span className="text-gelap-200">{"★".repeat(5 - r.rating)}</span></div>
-            <p className="mt-2 text-sm text-gelap-700">&ldquo;{r.content}&rdquo;</p>
-            <div className="mt-3 flex items-center justify-between">
-              <div className="text-xs font-bold text-gelap">{r.author}</div>
-              <button onClick={() => remove(r.id)} className="btn-danger">×</button>
-            </div>
+            {editingId === r.id ? (
+              <div className="space-y-2">
+                <input className="input-light text-sm" placeholder="Auteur" value={edit.author} onChange={(e) => setEdit({ ...edit, author: e.target.value })} />
+                <select className="input-light" value={edit.rating} onChange={(e) => setEdit({ ...edit, rating: Number(e.target.value) })}>
+                  {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n} ★</option>)}
+                </select>
+                <textarea className="input-light text-xs min-h-[60px]" placeholder="Témoignage" value={edit.content} onChange={(e) => setEdit({ ...edit, content: e.target.value })} />
+                <div className="flex justify-end gap-2">
+                  <button onClick={() => setEditingId(null)} className="btn-ghost text-xs">Annuler</button>
+                  <button onClick={() => saveEdit(r.id)} disabled={busy} className="btn-primary text-xs">Enregistrer</button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="text-accent">{"★".repeat(r.rating)}<span className="text-gelap-200">{"★".repeat(5 - r.rating)}</span></div>
+                <p className="mt-2 text-sm text-gelap-700">&ldquo;{r.content}&rdquo;</p>
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="text-xs font-bold text-gelap">{r.author}</div>
+                  <div className="flex gap-2">
+                    <button title="Modifier" onClick={() => startEdit(r)} className="font-bold text-gelap-500 hover:text-brand-dark">✎</button>
+                    <button onClick={() => remove(r.id)} className="btn-danger">×</button>
+                  </div>
+                </div>
+              </>
+            )}
           </li>
         ))}
       </ul>
