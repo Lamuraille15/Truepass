@@ -72,7 +72,7 @@ export default async function DashboardPage() {
       <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[
           { label: "Projets réalisés", value: projects.data?.length ?? 0 },
-          { label: "Années d'expérience", value: experiences.data?.length ?? 0 },
+          { label: "Expériences", value: experiences.data?.length ?? 0 },
           { label: "Compétences", value: skills.data?.length ?? 0 },
           { label: "Diplômes", value: education.data?.length ?? 0 },
         ].map((s) => (
