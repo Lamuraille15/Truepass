@@ -26,7 +26,7 @@ type Props = {
 export function DashboardClient({ username, profile, completeness, initial }: Props) {
   const stats = [
     { label: "Projets réalisés", value: initial.projects.length },
-    { label: "Années d'expérience", value: "+" + Math.max(0, initial.experiences.length - 1) },
+    { label: "Expériences", value: "+" + Math.max(0, initial.experiences.length - 1) },
     { label: "Compétences", value: initial.skills.length },
     { label: "Diplômes", value: initial.education.length },
   ];
