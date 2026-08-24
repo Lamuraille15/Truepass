@@ -51,37 +51,37 @@ export default async function DashboardLayout({
         </div>
       </main>
 
-      {/* 📱 BARRE DE NAVIGATION BASSE MOBILE (Fixée en bas de l'écran sur téléphone) */}
-      <nav className="fixed bottom-0 inset-x-0 z-50 bg-gelap-100 border-t border-gelap-200 py-2 px-4 flex items-center justify-around md:hidden shadow-lg backdrop-blur-md bg-opacity-95">
+      {/* 📱 BARRE DE NAVIGATION BASSE MOBILE COMPLÈTE (5 modules alignés) */}
+      <nav className="fixed bottom-0 inset-x-0 z-50 bg-gelap-100 border-t border-gelap-200 py-2 px-2 flex items-center justify-around md:hidden shadow-lg backdrop-blur-md bg-opacity-95">
         
-        {/* Bouton Accueil / Vue d'ensemble */}
-        <Link href="/dashboard" className="flex flex-col items-center gap-1 text-gelap-400 hover:text-brand transition">
-          <svg xmlns="http://w3.org" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
-          <span className="text-[9px] font-bold">Accueil</span>
-        </Link>
-
-        {/* Bouton Profil */}
+        {/* 1. Profil */}
         <Link href="/dashboard/profile" className="flex flex-col items-center gap-1 text-gelap-400 hover:text-brand transition">
-          <svg xmlns="http://w3.org" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <svg xmlns="http://w3.org" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
           <span className="text-[9px] font-bold">Profil</span>
         </Link>
 
-        {/* Bouton Compétences */}
+        {/* 2. Compétences */}
         <Link href="/dashboard/skills" className="flex flex-col items-center gap-1 text-gelap-400 hover:text-brand transition">
-          <svg xmlns="http://w3.org" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-4.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2z"></path><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-4.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z"></path></svg>
+          <svg xmlns="http://w3.org" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-4.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2z"></path><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-4.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z"></path></svg>
           <span className="text-[9px] font-bold">Compétences</span>
         </Link>
 
-        {/* Bouton Expériences */}
+        {/* 3. Expériences */}
         <Link href="/dashboard/experiences" className="flex flex-col items-center gap-1 text-gelap-400 hover:text-brand transition">
-          <svg xmlns="http://w3.org" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-          <span className="text-[9px] font-bold">Parcours</span>
+          <svg xmlns="http://w3.org" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+          <span className="text-[9px] font-bold">Expériences</span>
         </Link>
 
-        {/* Bouton Projets */}
+        {/* 4. Projets */}
         <Link href="/dashboard/projects" className="flex flex-col items-center gap-1 text-gelap-400 hover:text-brand transition">
-          <svg xmlns="http://w3.org" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+          <svg xmlns="http://w3.org" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
           <span className="text-[9px] font-bold">Projets</span>
+        </Link>
+
+        {/* 5. Diplômes */}
+        <Link href="/dashboard/education" className="flex flex-col items-center gap-1 text-gelap-400 hover:text-brand transition">
+          <svg xmlns="http://w3.org" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"></path></svg>
+          <span className="text-[9px] font-bold">Diplômes</span>
         </Link>
 
       </nav>
